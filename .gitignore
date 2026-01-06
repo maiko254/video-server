@@ -1,0 +1,31 @@
+# ---- Node / npm ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---- Logs ----
+logs/
+*.log
+
+# ---- Local videos (do not commit personal media) ----
+videos/
+# If you want the folder to exist in the repo but stay empty, see note below.
+
+# ---- Environment files (optional, but good practice to ignore) ----
+.env
+.env.* 
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Editor / IDE ----
+.vscode/
+.idea/
+*.swp
+
+# ---- WSL / misc ----
+*~

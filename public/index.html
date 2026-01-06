@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Local Video Server</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="title">Local Video Server</h1>
+      <p class="subtitle">Videos available on this Wi‑Fi network</p>
+    </header>
+
+    <main class="container">
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Videos</h2>
+          <button id="refreshBtn" class="btn" type="button" title="Reload video list">
+            Refresh
+          </button>
+        </div>
+
+        <div id="status" class="status">Loading…</div>
+
+        <ul id="videoList" class="video-list" aria-label="Video list"></ul>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Player</h2>
+
+        <div class="player">
+          <!--
+            Using a single <video> element:
+            - We update its src when a user clicks a video title.
+            - The server supports Range requests, so seeking works.
+          -->
+          <video
+            id="player"
+            class="player-video"
+            controls
+            preload="metadata"
+            playsinline
+          >
+            Your browser does not support the video tag.
+          </video>
+
+          <div id="nowPlaying" class="now-playing">Select a video above to play.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <small>Local network only • No accounts • No tracking</small>
+    </footer>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

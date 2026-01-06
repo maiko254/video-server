@@ -1,0 +1,117 @@
+/**
+ * Frontend logic:
+ * - Fetch /api/videos
+ * - Render a simple list
+ * - On click, set <video src> to /api/stream/:name and play
+ */
+
+const videoListEl = document.getElementById("videoList");
+const statusEl = document.getElementById("status");
+const refreshBtn = document.getElementById("refreshBtn");
+const playerEl = document.getElementById("player");
+const nowPlayingEl = document.getElementById("nowPlaying");
+
+// Keep track of selected item so we can highlight it (simple UX)
+let selectedName = null;
+
+function extOf(fileName) {
+  const i = fileName.lastIndexOf(".");
+  return i >= 0 ? fileName.slice(i + 1).toUpperCase() : "";
+}
+
+function setStatus(text) {
+  statusEl.textContent = text;
+  statusEl.style.display = text ? "block" : "none";
+}
+
+function clearList() {
+  videoListEl.innerHTML = "";
+}
+
+function renderList(videos) {
+  clearList();
+
+  if (!videos.length) {
+    setStatus("No videos found in /videos (supported: mp4, webm).");
+    return;
+  }
+
+  setStatus("");
+
+  for (const v of videos) {
+    const name = v.name;
+
+    const li = document.createElement("li");
+    li.className = "video-item";
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "video-btn";
+    btn.dataset.name = name;
+
+    const left = document.createElement("span");
+    left.className = "video-name";
+    left.textContent = name;
+
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = extOf(name);
+
+    btn.appendChild(left);
+    btn.appendChild(badge);
+
+    btn.addEventListener("click", async () => {
+      selectedName = name;
+
+      // Update "now playing" text
+      nowPlayingEl.textContent = `Now playing: ${name}`;
+
+      // Point the video element to the streaming endpoint.
+      // encodeURIComponent is critical for spaces and special characters in filenames.
+      const url = `/api/stream/${encodeURIComponent(name)}`;
+
+      // Reset the player before setting a new src (helps with switching videos)
+      playerEl.pause();
+      playerEl.removeAttribute("src");
+      playerEl.load();
+
+      playerEl.src = url;
+
+      // Try to autoplay after user interaction (allowed by browsers)
+      try {
+        await playerEl.play();
+      } catch {
+        // If autoplay is blocked for some reason, user can hit Play.
+      }
+
+      // Simple visual indication: bold the selected item
+      document.querySelectorAll(".video-btn").forEach((b) => {
+        b.style.fontWeight = b.dataset.name === selectedName ? "700" : "400";
+      });
+    });
+
+    li.appendChild(btn);
+    videoListEl.appendChild(li);
+  }
+}
+
+async function loadVideos() {
+  setStatus("Loading…");
+  clearList();
+
+  try {
+    const res = await fetch("/api/videos");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const videos = await res.json();
+    renderList(videos);
+  } catch (err) {
+    console.error(err);
+    setStatus("Could not load videos. Is the server running?");
+  }
+}
+
+refreshBtn.addEventListener("click", loadVideos);
+
+// Initial load
+loadVideos();
