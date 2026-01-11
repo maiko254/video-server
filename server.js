@@ -30,7 +30,7 @@ app.use(express.static(PUBLIC_DIR));
 
 /**
  * GET /api/videos
- * Returns: [{ name: "some-file.mp4" }, ...]
+ * Returns: { videos: ["file.mp4"], pictures: ["img.jpg"] }
  */
 app.get("/api/videos", async (req, res) => {
   try {
@@ -177,4 +177,5 @@ const HOST = "0.0.0.0";
 app.listen(PORT, HOST, () => {
   console.log(`Video server running at http://${HOST}:${PORT}`);
   console.log(`Serving videos from: ${VIDEOS_DIR}`);
+  console.log(`Serving pictures from: ${PICTURES_DIR}`);
 });

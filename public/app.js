@@ -114,7 +114,7 @@ function renderList(listEl, names, asImage, emptyText) {
     btn.appendChild(badge);
 
     btn.addEventListener("click", async () => {
-      await handleSelect(name, asImage || isImageExt(extOf(name)));
+      await handleSelect(name, asImage);
     });
 
     li.appendChild(btn);
