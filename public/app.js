@@ -37,7 +37,7 @@ function renderList(videos) {
   clearList();
 
   if (!videos.length) {
-    setStatus("No files found in /videos (supported: mp4, webm, jpg/jpeg).");
+    setStatus("No files found in /videos or /pictures (supported: mp4, webm, jpg/jpeg).");
     return;
   }
 
