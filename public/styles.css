@@ -129,17 +129,25 @@ body {
   border-radius: 999px;
 }
 
+.placeholder {
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .player {
   display: grid;
   gap: 10px;
 }
 
-.player-video {
+.player-video,
+.player-image {
   width: 100%;
   max-height: 70vh;
   background: #000;
   border-radius: 12px;
   border: 1px solid var(--border);
+  object-fit: contain;
 }
 
 .now-playing {

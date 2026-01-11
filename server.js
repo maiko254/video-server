@@ -1,8 +1,8 @@
 /**
  * Simple local-network video server.
  *
- * - Lists video files from ./videos
- * - Streams video files with HTTP Range requests
+ * - Lists video files from ./videos and picture files from ./pictures
+ * - Streams video and image files with HTTP Range requests
  * - Serves a static frontend from ./public
  *
  * Keep this simple: no auth, no DB, local network only.
@@ -18,32 +18,50 @@ const app = express();
 // Absolute paths to important folders
 const PUBLIC_DIR = path.join(__dirname, "public");
 const VIDEOS_DIR = path.join(__dirname, "videos");
+const PICTURES_DIR = path.join(__dirname, "pictures");
 
 // Only allow common formats you asked for
-const ALLOWED_EXTENSIONS = new Set([".mp4", ".webm"]);
+const VIDEO_EXTENSIONS = new Set([".mp4", ".webm"]);
+const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg"]);
+const ALLOWED_EXTENSIONS = new Set([...VIDEO_EXTENSIONS, ...IMAGE_EXTENSIONS]);
 
 // Serve the frontend (index.html, app.js, styles.css)
 app.use(express.static(PUBLIC_DIR));
 
 /**
- * GET /api/videos
- * Returns: [{ name: "some-file.mp4" }, ...]
+ * GET /api/videos (media listing; returns both videos and pictures)
+ * Returns: { videos: ["file.mp4"], pictures: ["img.jpg"] }
  */
 app.get("/api/videos", async (req, res) => {
   try {
-    const entries = await fsp.readdir(VIDEOS_DIR, { withFileTypes: true });
+    const [videoEntries, pictureEntries] = await Promise.all([
+      fsp.readdir(VIDEOS_DIR, { withFileTypes: true }).catch((err) => {
+        if (err && err.code === "ENOENT") return [];
+        throw err;
+      }),
+      fsp.readdir(PICTURES_DIR, { withFileTypes: true }).catch((err) => {
+        if (err && err.code === "ENOENT") return [];
+        throw err;
+      })
+    ]);
 
-    const files = entries
+    const videoFiles = videoEntries
       .filter((e) => e.isFile())
       .map((e) => e.name)
-      .filter((name) => ALLOWED_EXTENSIONS.has(path.extname(name).toLowerCase()))
-      .sort((a, b) => a.localeCompare(b));
+      .filter((name) => VIDEO_EXTENSIONS.has(path.extname(name).toLowerCase()));
 
-    res.json(files.map((name) => ({ name })));
+    const pictureFiles = pictureEntries
+      .filter((e) => e.isFile())
+      .map((e) => e.name)
+      .filter((name) => IMAGE_EXTENSIONS.has(path.extname(name).toLowerCase()));
+
+    res.json({
+      videos: videoFiles.sort((a, b) => a.localeCompare(b)),
+      pictures: pictureFiles.sort((a, b) => a.localeCompare(b))
+    });
   } catch (err) {
-    // Common case: videos folder missing
-    console.error("Error reading videos folder:", err);
-    res.status(500).json({ error: "Could not read /videos folder." });
+    console.error("Error reading media folders:", err);
+    res.status(500).json({ error: "Could not read media folders." });
   }
 });
 
@@ -55,6 +73,7 @@ function getContentType(fileName) {
   const ext = path.extname(fileName).toLowerCase();
   if (ext === ".mp4") return "video/mp4";
   if (ext === ".webm") return "video/webm";
+  if (ext === ".jpg" || ext === ".jpeg") return "image/jpeg";
   return "application/octet-stream";
 }
 
@@ -84,7 +103,8 @@ app.get("/api/stream/:name", async (req, res) => {
       return res.status(415).send("Unsupported media type.");
     }
 
-    const videoPath = path.join(VIDEOS_DIR, safeName);
+    const baseDir = VIDEO_EXTENSIONS.has(ext) ? VIDEOS_DIR : PICTURES_DIR;
+    const videoPath = path.join(baseDir, safeName);
 
     // Check file exists and get size
     const stat = await fsp.stat(videoPath);
@@ -157,4 +177,5 @@ const HOST = "0.0.0.0";
 app.listen(PORT, HOST, () => {
   console.log(`Video server running at http://${HOST}:${PORT}`);
   console.log(`Serving videos from: ${VIDEOS_DIR}`);
+  console.log(`Serving pictures from: ${PICTURES_DIR}`);
 });
