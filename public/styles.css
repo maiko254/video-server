@@ -91,6 +91,11 @@ body {
   gap: 8px;
 }
 
+#picturesList {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
 .video-item {
   border: 1px solid var(--border);
   border-radius: 10px;
