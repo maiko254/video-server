@@ -29,7 +29,7 @@ const ALLOWED_EXTENSIONS = new Set([...VIDEO_EXTENSIONS, ...IMAGE_EXTENSIONS]);
 app.use(express.static(PUBLIC_DIR));
 
 /**
- * GET /api/videos (media listing)
+ * GET /api/videos (media listing; returns both videos and pictures)
  * Returns: { videos: ["file.mp4"], pictures: ["img.jpg"] }
  */
 app.get("/api/videos", async (req, res) => {
