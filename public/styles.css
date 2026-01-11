@@ -129,6 +129,12 @@ body {
   border-radius: 999px;
 }
 
+.placeholder {
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .player {
   display: grid;
   gap: 10px;

@@ -55,11 +55,10 @@ app.get("/api/videos", async (req, res) => {
       .map((e) => e.name)
       .filter((name) => IMAGE_EXTENSIONS.has(path.extname(name).toLowerCase()));
 
-    const files = [...videoFiles, ...pictureFiles].sort((a, b) =>
-      a.localeCompare(b)
-    );
-
-    res.json(files.map((name) => ({ name })));
+    res.json({
+      videos: videoFiles.sort((a, b) => a.localeCompare(b)),
+      pictures: pictureFiles.sort((a, b) => a.localeCompare(b))
+    });
   } catch (err) {
     console.error("Error reading media folders:", err);
     res.status(500).json({ error: "Could not read media folders." });
