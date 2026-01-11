@@ -21,10 +21,6 @@ function extOf(fileName) {
   return i >= 0 ? fileName.slice(i + 1).toUpperCase() : "";
 }
 
-function isImageExt(ext) {
-  return ext === "JPG" || ext === "JPEG";
-}
-
 function setStatus(text) {
   statusEl.textContent = text;
   statusEl.style.display = text ? "block" : "none";
