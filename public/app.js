@@ -148,7 +148,7 @@ async function loadVideos() {
     }
   } catch (err) {
     console.error(err);
-    setStatus("Could not load videos. Is the server running?");
+    setStatus("Could not load media. Is the server running?");
   }
 }
 
