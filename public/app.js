@@ -9,6 +9,7 @@ const videoListEl = document.getElementById("videoList");
 const statusEl = document.getElementById("status");
 const refreshBtn = document.getElementById("refreshBtn");
 const playerEl = document.getElementById("player");
+const imageEl = document.getElementById("imageViewer");
 const nowPlayingEl = document.getElementById("nowPlaying");
 
 // Keep track of selected item so we can highlight it (simple UX)
@@ -17,6 +18,10 @@ let selectedName = null;
 function extOf(fileName) {
   const i = fileName.lastIndexOf(".");
   return i >= 0 ? fileName.slice(i + 1).toUpperCase() : "";
+}
+
+function isImageExt(ext) {
+  return ext === "JPG" || ext === "JPEG";
 }
 
 function setStatus(text) {
@@ -32,7 +37,7 @@ function renderList(videos) {
   clearList();
 
   if (!videos.length) {
-    setStatus("No videos found in /videos (supported: mp4, webm).");
+    setStatus("No files found in /videos (supported: mp4, webm, jpg/jpeg).");
     return;
   }
 
@@ -64,24 +69,41 @@ function renderList(videos) {
       selectedName = name;
 
       // Update "now playing" text
-      nowPlayingEl.textContent = `Now playing: ${name}`;
+      const ext = extOf(name);
+      nowPlayingEl.textContent = `${isImageExt(ext) ? "Now viewing" : "Now playing"}: ${name}`;
 
       // Point the video element to the streaming endpoint.
       // encodeURIComponent is critical for spaces and special characters in filenames.
       const url = `/api/stream/${encodeURIComponent(name)}`;
 
-      // Reset the player before setting a new src (helps with switching videos)
-      playerEl.pause();
-      playerEl.removeAttribute("src");
-      playerEl.load();
+      if (isImageExt(ext)) {
+        // Hide video player, show image
+        playerEl.pause();
+        playerEl.removeAttribute("src");
+        playerEl.load();
+        playerEl.style.display = "none";
 
-      playerEl.src = url;
+        imageEl.src = url;
+        imageEl.alt = name;
+        imageEl.style.display = "block";
+      } else {
+        // Reset the player before setting a new src (helps with switching videos)
+        imageEl.removeAttribute("src");
+        imageEl.style.display = "none";
 
-      // Try to autoplay after user interaction (allowed by browsers)
-      try {
-        await playerEl.play();
-      } catch {
-        // If autoplay is blocked for some reason, user can hit Play.
+        playerEl.style.display = "block";
+        playerEl.pause();
+        playerEl.removeAttribute("src");
+        playerEl.load();
+
+        playerEl.src = url;
+
+        // Try to autoplay after user interaction (allowed by browsers)
+        try {
+          await playerEl.play();
+        } catch {
+          // If autoplay is blocked for some reason, user can hit Play.
+        }
       }
 
       // Simple visual indication: bold the selected item

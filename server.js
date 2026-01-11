@@ -20,7 +20,7 @@ const PUBLIC_DIR = path.join(__dirname, "public");
 const VIDEOS_DIR = path.join(__dirname, "videos");
 
 // Only allow common formats you asked for
-const ALLOWED_EXTENSIONS = new Set([".mp4", ".webm"]);
+const ALLOWED_EXTENSIONS = new Set([".mp4", ".webm", ".jpg", ".jpeg"]);
 
 // Serve the frontend (index.html, app.js, styles.css)
 app.use(express.static(PUBLIC_DIR));
@@ -55,6 +55,7 @@ function getContentType(fileName) {
   const ext = path.extname(fileName).toLowerCase();
   if (ext === ".mp4") return "video/mp4";
   if (ext === ".webm") return "video/webm";
+  if (ext === ".jpg" || ext === ".jpeg") return "image/jpeg";
   return "application/octet-stream";
 }
 
