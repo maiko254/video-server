@@ -1,8 +1,8 @@
 /**
  * Simple local-network video server.
  *
- * - Lists video files from ./videos
- * - Streams video files with HTTP Range requests
+ * - Lists video files from ./videos and picture files from ./pictures
+ * - Streams video and image files with HTTP Range requests
  * - Serves a static frontend from ./public
  *
  * Keep this simple: no auth, no DB, local network only.
