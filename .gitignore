@@ -11,6 +11,8 @@ logs/
 
 # ---- Local videos (do not commit personal media) ----
 videos/
+# ---- Images (do not commit personal media) ----
+pictures/
 # If you want the folder to exist in the repo but stay empty, see note below.
 
 # ---- Environment files (optional, but good practice to ignore) ----
